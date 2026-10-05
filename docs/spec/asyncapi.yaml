@@ -92,6 +92,18 @@ channels:
         x-ballerina-event-type: received
         payload:
           $ref: '#/components/schemas/SmsStatusChangeEventWrapper'
+      smsStatusScheduled:
+        x-ballerina-event-type: scheduled
+        payload:
+          $ref: '#/components/schemas/SmsStatusChangeEventWrapper'
+      smsStatusRead:
+        x-ballerina-event-type: read
+        payload:
+          $ref: '#/components/schemas/SmsStatusChangeEventWrapper'
+      smsStatusCanceled:
+        x-ballerina-event-type: canceled
+        payload:
+          $ref: '#/components/schemas/SmsStatusChangeEventWrapper'
     bindings:
       http:
         method: POST
@@ -123,6 +135,9 @@ operations:
       - $ref: '#/channels/smsStatus/messages/smsStatusUndelivered'
       - $ref: '#/channels/smsStatus/messages/smsStatusReceiving'
       - $ref: '#/channels/smsStatus/messages/smsStatusReceived'
+      - $ref: '#/channels/smsStatus/messages/smsStatusScheduled'
+      - $ref: '#/channels/smsStatus/messages/smsStatusRead'
+      - $ref: '#/channels/smsStatus/messages/smsStatusCanceled'
 components:
   schemas:
     CallStatusEventWrapper:
