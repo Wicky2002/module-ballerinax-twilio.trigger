@@ -1,0 +1,13 @@
+[package]
+distribution = "2201.12.0"
+org = "ballerinax"
+name = "twilio.trigger"
+version = "0.1.0"
+license = ["Apache-2.0"]
+authors = ["Ballerina"]
+keywords = ["Area/Communication", "Vendor/Twilio", "Cost/Freemium", "Type/Trigger"]
+icon = "icon.png"
+repository = "https://github.com/ballerina-platform/module-ballerinax-twilio.trigger"
+
+[platform.java21]
+graalvmCompatible = true
