@@ -1,0 +1,14 @@
+{
+    "AccountSid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "ApiVersion": "2010-04-01",
+    "CallSid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "CallbackSource": "call-progress-events",
+    "Called": "+15558675310",
+    "Caller": "+15017122661",
+    "Direction": "outbound-api",
+    "From": "+15017122661",
+    "To": "+15558675310",
+    "Timestamp": "Mon, 26 Oct 2026 10:15:30 +0000",
+    "SequenceNumber": "0",
+    "CallStatus": "initiated"
+}
