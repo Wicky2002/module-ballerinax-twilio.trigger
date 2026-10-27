@@ -1,11 +1,20 @@
 asyncapi: 3.0.0
-x-ballerina-event-identifier:
-  type: body
-  path: MessageStatus
+# Twilio signs the full URL it posts to, followed by the form parameters sorted by name, with HMAC-SHA1 keyed by
+# the account's Auth Token, and sends it Base64-encoded in X-Twilio-Signature. Each channel has its own path, so
+# the signed URL is the configured public base URL plus the request path.
+x-ballerina-auth:
+  header: X-Twilio-Signature
+  signature:
+    algorithm: sha1
+    encoding: base64
+    headerFormat: "$signature"
+    input: "$config('webhookBaseUrl') . $uri . $formParams"
 info:
   title: Twilio Events API
   version: 1.0.0
-  description: TwiML events for programmable voice and message.
+  description: >-
+    Status callbacks for Twilio programmable voice calls and messages. Twilio posts them as form-encoded parameters
+    to the StatusCallback URL of a call or message (or of its phone number or Messaging Service).
   termsOfService: https://www.twilio.com/legal/tos
   contact:
     name: Twilio Contact Center
@@ -13,11 +22,19 @@ info:
   externalDocs:
     description: Twilio All API Reference Documentation
     url: https://www.twilio.com/docs/all
-defaultContentType: application/json
+defaultContentType: application/x-www-form-urlencoded
 channels:
   callStatus:
     address: callStatus
+    description: Call status callbacks, served at `/callStatus` and identified by `CallStatus`.
+    x-ballerina-event-identifier:
+      type: body
+      path: CallStatus
     messages:
+      callStatusInitiated:
+        x-ballerina-event-type: initiated
+        payload:
+          $ref: '#/components/schemas/CallStatusEventWrapper'
       callStatusQueued:
         x-ballerina-event-type: queued
         payload:
@@ -55,6 +72,10 @@ channels:
         method: POST
   smsStatus:
     address: smsStatus
+    description: Message status callbacks, served at `/smsStatus` and identified by `MessageStatus`.
+    x-ballerina-event-identifier:
+      type: body
+      path: MessageStatus
     messages:
       smsStatusAccepted:
         x-ballerina-event-type: accepted
@@ -104,6 +125,10 @@ channels:
         x-ballerina-event-type: canceled
         payload:
           $ref: '#/components/schemas/SmsStatusChangeEventWrapper'
+      smsStatusPartiallyDelivered:
+        x-ballerina-event-type: partially_delivered
+        payload:
+          $ref: '#/components/schemas/SmsStatusChangeEventWrapper'
     bindings:
       http:
         method: POST
@@ -113,6 +138,7 @@ operations:
     channel:
       $ref: '#/channels/callStatus'
     messages:
+      - $ref: '#/channels/callStatus/messages/callStatusInitiated'
       - $ref: '#/channels/callStatus/messages/callStatusQueued'
       - $ref: '#/channels/callStatus/messages/callStatusRinging'
       - $ref: '#/channels/callStatus/messages/callStatusInProgress'
@@ -138,6 +164,7 @@ operations:
       - $ref: '#/channels/smsStatus/messages/smsStatusScheduled'
       - $ref: '#/channels/smsStatus/messages/smsStatusRead'
       - $ref: '#/channels/smsStatus/messages/smsStatusCanceled'
+      - $ref: '#/channels/smsStatus/messages/smsStatusPartiallyDelivered'
 components:
   schemas:
     CallStatusEventWrapper:
@@ -242,6 +269,33 @@ components:
         RecordingDuration:
           type: string
           description: The duration of the recorded audio (in seconds).
+        Duration:
+          type: string
+          description: The duration in minutes of the just-completed call. Only present in the completed event.
+        SipResponseCode:
+          type: string
+          description: The SIP response code for the call. Only present in terminal events.
+        Timestamp:
+          type: string
+          description: When the event fired, as UTC in RFC 2822 format.
+        CallbackSource:
+          type: string
+          description: Always `call-progress-events` on status callbacks.
+        SequenceNumber:
+          type: string
+          description: The order in which the events were fired, starting from 0.
+        StirStatus:
+          type: string
+          description: The STIR/SHAKEN attestation level, A, B or C.
+        ParentCallSid:
+          type: string
+          description: The SID of the call that created this one, for a call created by a `<Dial>`.
+        ForwardedFrom:
+          type: string
+          description: The number the call was forwarded from, when the carrier provides it.
+        CallerName:
+          type: string
+          description: The caller's name, for an inbound call with Caller ID Lookup enabled.
     SmsStatusChangeEventWrapper:
       additionalProperties: true
       externalDocs:
@@ -314,3 +368,21 @@ components:
         ApiVersion:
           type: string
           description: The version of the Twilio API used to handle this message.
+        ErrorCode:
+          type: string
+          description: The error code when `MessageStatus` is `failed` or `undelivered`.
+        RawDlrDoneDate:
+          type: string
+          description: The carrier's delivery receipt Done Date, `YYMMDDhhmm`, for delivered or undelivered SMS and MMS.
+        ChannelInstallSid:
+          type: string
+          description: The channel installation SID, for WhatsApp, RCS and other channels.
+        ChannelStatusMessage:
+          type: string
+          description: The error message returned by the messaging channel when delivery failed.
+        ChannelPrefix:
+          type: string
+          description: The channel prefix, such as `whatsapp`, for non-SMS channels.
+        EventType:
+          type: string
+          description: Information about post-delivery events, for channels that report them.
