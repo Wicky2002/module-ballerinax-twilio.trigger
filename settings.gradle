@@ -32,6 +32,8 @@ rootProject.name = 'module-ballerinax-twilio.trigger'
 include ':twilio.trigger-ballerina'
 
 project(':twilio.trigger-ballerina').projectDir = file("ballerina")
+include ':twilio.trigger-compiler-plugin'
+project(':twilio.trigger-compiler-plugin').projectDir = file("compiler-plugin")
 
 develocity {
     buildScan {
