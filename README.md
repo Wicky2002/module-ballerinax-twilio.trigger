@@ -33,9 +33,8 @@ using [ngrok](https://ngrok.com/) to expose your local listener to the internet.
 
 1. In the [Twilio Console](https://console.twilio.com/), find **Account Info** on the home page and
    copy the **Auth Token**. Twilio signs every callback with it, and the listener uses it to
-   reject requests that did not come from Twilio.
-
-   <img src="https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-twilio.trigger/main/docs/setup/resources/auth-token.png" alt="Twilio Console Account Info with the Account SID and Auth Token" width="600">
+   reject requests that did not come from Twilio
+   ([how Twilio signs requests](https://www.twilio.com/docs/usage/webhooks/webhooks-security)).
 
 2. Expose port `8090` with ngrok:
 
@@ -43,29 +42,34 @@ using [ngrok](https://ngrok.com/) to expose your local listener to the internet.
    ngrok http 8090
    ```
 
-   Copy the `Forwarding` URL ngrok prints out - this is your temporary public base URL.
-
-   <img src="https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-twilio.trigger/main/docs/setup/resources/ngrok-forwarding.png" alt="ngrok forwarding a public URL to localhost:8090" width="600">
+   Copy the `Forwarding` URL ngrok prints out (for example `https://abc123.ngrok-free.app`) - this
+   is your temporary public base URL.
 
 3. Write your service (see [Quickstart](#quickstart) below) with the Auth Token as
    `webhookSecret` and the ngrok URL as `webhookBaseUrl`, and run it with `bal run`.
    `webhookBaseUrl` must be exactly the scheme and host Twilio calls, without a trailing slash,
    because Twilio signs the full URL.
 
-4. To receive call status callbacks for calls to your Twilio number, go to **Phone Numbers >
-   Manage > Active numbers**, select your number and open its **Configure** tab.
+4. To receive call status callbacks, create a call with `StatusCallback` set to
+   `<ngrok URL>/callStatus`. Twilio calls `To` and plays the TwiML at `Url`; on a trial account,
+   `To` must be a number you have verified.
 
-   <img src="https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-twilio.trigger/main/docs/setup/resources/webhook-settings-page.png" alt="Twilio phone number Configure tab with the Voice Configuration section" width="600">
+   ```bash
+   curl -X POST "https://api.twilio.com/2010-04-01/Accounts/$TWILIO_ACCOUNT_SID/Calls.json" \
+     --data-urlencode "From=<your Twilio number>" \
+     --data-urlencode "To=<your phone number>" \
+     --data-urlencode "Url=http://demo.twilio.com/docs/voice.xml" \
+     --data-urlencode "StatusCallback=<ngrok URL>/callStatus" \
+     --data-urlencode "StatusCallbackEvent=initiated ringing answered completed" \
+     -u "$TWILIO_ACCOUNT_SID:$TWILIO_AUTH_TOKEN"
+   ```
 
-5. Under **Voice Configuration**, set **Call status changes** to `<ngrok URL>/callStatus` with
-   method `HTTP POST`, and click **Save configuration**.
+   For calls to your Twilio number, set **Call status changes** under **Voice Configuration** on
+   the number's **Configure** tab (**Phone Numbers > Manage > Active numbers**) to
+   `<ngrok URL>/callStatus` instead. See [Voice webhooks](https://www.twilio.com/docs/usage/webhooks/voice-webhooks)
+   and the [Call resource](https://www.twilio.com/docs/voice/api/call-resource) for both options.
 
-   <img src="https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-twilio.trigger/main/docs/setup/resources/webhook-form-filled.png" alt="Twilio Voice Configuration with Call status changes set to the ngrok callStatus URL" width="600">
-
-6. Call your Twilio number from your phone. When the call ends, Twilio posts its final status to
-   `/callStatus`.
-
-7. To receive message status callbacks, send a message with `StatusCallback` set to
+5. To receive message status callbacks, send a message with `StatusCallback` set to
    `<ngrok URL>/smsStatus`. On a trial account, `To` must be a number you have verified.
 
    ```bash
@@ -77,16 +81,19 @@ using [ngrok](https://ngrok.com/) to expose your local listener to the internet.
      -u "$TWILIO_ACCOUNT_SID:$TWILIO_AUTH_TOKEN"
    ```
 
-   Twilio posts each status the message goes through (`queued`, `sent`, `delivered`, ...). Each
-   delivery shows up in the ngrok console with `200 OK`, and your handler runs.
+   See [Track the message status of outbound messages](https://www.twilio.com/docs/messaging/guides/track-outbound-message-status).
 
-   <img src="https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-twilio.trigger/main/docs/setup/resources/webhook-confirmed.png" alt="ngrok console showing Twilio status callbacks answered with 200 OK" width="600">
+6. Twilio posts each status the call or message goes through (`initiated`, `ringing`, `completed`,
+   `queued`, `sent`, `delivered`, ...). Each callback shows up in the ngrok console as
+   `POST /callStatus` or `POST /smsStatus` with `200 OK`, and your handler runs. To see a
+   callback's parameters, open ngrok's request inspector at `http://127.0.0.1:4040`. A `401` means
+   the signature check failed: check the Auth Token and that `webhookBaseUrl` matches the ngrok URL.
 
-Twilio sends only the final call status (`completed`, `busy`, `failed`, `no-answer` or `canceled`)
-unless you ask for more. To also get `initiated`, `ringing` and `in-progress`, set
-`StatusCallbackEvent` (`initiated ringing answered completed`) when you create a call through the
-REST API. For all messages sent through a Messaging Service, set the service's **Delivery Status
-Callback** under **Integration** instead of passing `StatusCallback` each time.
+Without `StatusCallbackEvent`, Twilio sends only the final call status (`completed`, `busy`,
+`failed`, `no-answer` or `canceled`), and the **Call status changes** setting on a number works the
+same way. `answered` arrives as `in-progress`. For all messages sent through a Messaging Service,
+set the service's **Delivery Status Callback** under **Integration** instead of passing
+`StatusCallback` each time.
 
 ### Production / business integration
 
@@ -103,8 +110,9 @@ webhookSecret = "<your Auth Token>"
 webhookBaseUrl = "https://<your production host>"
 ```
 
-Then use your production URL in place of the ngrok URL in the callback URLs above. If you rotate
-the Auth Token in the Twilio Console, update `webhookSecret` too, or every callback is rejected.
+Then use your production URL in place of the ngrok URL in the callback URLs above, and set
+`webhookBaseUrl` to it. If you rotate the Auth Token in the Twilio Console, update
+`webhookSecret` too, or every callback is rejected.
 
 ### Compatibility
 
@@ -208,7 +216,7 @@ Use the `bal run` command to compile and run the Ballerina program.
 
 ### Step 6: Point Twilio at your service
 
-See [Setup guide](#setup-guide) above for the full walkthrough (with screenshots) of exposing your
+See [Setup guide](#setup-guide) above for the full walkthrough of exposing your
 service and setting the callback URLs, for both local testing and production use.
 
 ## Examples
