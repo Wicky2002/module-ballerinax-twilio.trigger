@@ -42,7 +42,8 @@ using [ngrok](https://ngrok.com/) to expose your local listener to the internet.
 3. Write your service (see [Quickstart](#quickstart) below) with the Auth Token as
    `webhookSecret` and the ngrok URL as `webhookBaseUrl`, and run it with `bal run`.
    `webhookBaseUrl` must be exactly the scheme and host Twilio calls, without a trailing slash,
-   because Twilio signs the full URL.
+   because Twilio signs the full URL. Use the callback URLs below without query parameters: the
+   listener checks the signature against the path only, so a URL with a query string is rejected.
 
 4. To receive call status callbacks, create a call with `StatusCallback` set to
    `<ngrok URL>/callStatus`. Twilio calls `To` and plays the TwiML at `Url`; on a trial account,
@@ -137,8 +138,7 @@ listener twilio:Listener twilioListener = new (userInput, 8090);
 ```
 
 `webhookSecret` should always be set to your account's Auth Token - this is what the trigger uses
-to verify incoming callbacks actually came from Twilio. Omitting it disables that verification, so
-it isn't shown here as a normal setup option. `webhookBaseUrl` is the public base URL Twilio calls,
+to verify incoming callbacks actually came from Twilio. Without it, the listener rejects every request with `401 Unauthorized`. `webhookBaseUrl` is the public base URL Twilio calls,
 which is part of what Twilio signs.
 
 If you don't provide a port it will use the default port, which is 8090.
