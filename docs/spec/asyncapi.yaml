@@ -170,7 +170,7 @@ components:
     CallStatusEventWrapper:
       additionalProperties: true
       externalDocs:
-        description: Twilio's voice service commom request parameters.
+        description: Twilio's voice service common request parameters.
         url: https://www.twilio.com/docs/voice/twiml#request-parameters
       properties:
         AccountSid:
@@ -202,7 +202,7 @@ components:
           description: The state that called.
         CalledZip:
           type: string
-          description: The zip code that called.
+          description: The zip code of the called party.
         Caller:
           type: string
           description: The number of the caller.
@@ -217,7 +217,7 @@ components:
           description: The state of the caller.
         CallerZip:
           type: string
-          description: he zip code of the caller.
+          description: The zip code of the caller.
         Direction:
           type: string
           description: A string describing the direction of the call.
@@ -241,7 +241,7 @@ components:
           description: The identity token which contains the information needs for authentication and verification of calls.
         StirVerstat:
           type: string
-          description: The value that verify the authentiticy of a caler ID on an incomming call.
+          description: The value that verifies the authenticity of the caller ID on an incoming call.
         To:
           type: string
           description: The phone number or client identifier of the called party.
@@ -253,7 +253,7 @@ components:
           description: The country of the called party.
         ToState:
           type: string
-          description: The postal code of the called party.
+          description: The state or province of the called party.
         ToZip:
           type: string
           description: The postal code of the called party.
@@ -299,7 +299,7 @@ components:
     SmsStatusChangeEventWrapper:
       additionalProperties: true
       externalDocs:
-        description: Twilio's message service commom request parameters.
+        description: Twilio's message service common request parameters.
         url: https://www.twilio.com/docs/messaging/guides/webhook-request#request-parameters
       properties:
         MessageSid:

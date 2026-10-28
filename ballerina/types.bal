@@ -41,7 +41,7 @@ public type CallStatusEventWrapper record {|
     string CalledCountry?;
     # The state that called.
     string CalledState?;
-    # The zip code that called.
+    # The zip code of the called party.
     string CalledZip?;
     # The number of the caller.
     string Caller?;
@@ -51,7 +51,7 @@ public type CallStatusEventWrapper record {|
     string CallerCountry?;
     # The state of the caller.
     string CallerState?;
-    # he zip code of the caller.
+    # The zip code of the caller.
     string CallerZip?;
     # A string describing the direction of the call.
     string Direction?;
@@ -67,7 +67,7 @@ public type CallStatusEventWrapper record {|
     string FromZip?;
     # The identity token which contains the information needs for authentication and verification of calls.
     string StirPassportToken?;
-    # The value that verify the authentiticy of a caler ID on an incomming call.
+    # The value that verifies the authenticity of the caller ID on an incoming call.
     string StirVerstat?;
     # The phone number or client identifier of the called party.
     string To?;
@@ -75,7 +75,7 @@ public type CallStatusEventWrapper record {|
     string ToCity?;
     # The country of the called party.
     string ToCountry?;
-    # The postal code of the called party.
+    # The state or province of the called party.
     string ToState?;
     # The postal code of the called party.
     string ToZip?;
