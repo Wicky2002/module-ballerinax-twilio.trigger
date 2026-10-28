@@ -1,0 +1,44 @@
+{
+  "version": "v1.0",
+  "listeners": [
+    {
+      "id": "$listener",
+      "doc": "Webhook listener that dispatches each inbound Twilio webhook event to the concrete service type matching its event family.",
+      "type": {
+        "name": "Listener"
+      },
+      "services": [
+        "$callStatus",
+        "$smsStatus"
+      ],
+      "multipleServicesAllowed": true,
+      "multipleServicesOfSameTypeAllowed": false
+    }
+  ],
+  "serviceTypes": [
+    {
+      "id": "$callStatus",
+      "doc": "Receives Twilio call status events: initiated, queued, ringing, in progress, completed, busy, failed, no answer, and canceled.",
+      "type": {
+        "name": "CallStatusService"
+      },
+      "concrete": true,
+      "multipleListenersAllowed": true,
+      "handlers": {
+        "backedByConcreteType": true
+      }
+    },
+    {
+      "id": "$smsStatus",
+      "doc": "Receives Twilio message status events: accepted, queued, sending, sent, failed, delivered, undelivered, receiving, received, scheduled, read, canceled, and partially delivered.",
+      "type": {
+        "name": "SmsStatusService"
+      },
+      "concrete": true,
+      "multipleListenersAllowed": true,
+      "handlers": {
+        "backedByConcreteType": true
+      }
+    }
+  ]
+}

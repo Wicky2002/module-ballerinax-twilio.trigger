@@ -1,0 +1,237 @@
+{
+  "version": "v1.0",
+  "metadata": {
+    "kind": "event"
+  },
+  "trigger": {
+    "displayName": "Twilio Event Integration",
+    "description": "Create a service to handle webhook events from Twilio",
+    "type": "twilio"
+  },
+  "initForm": {
+    "fields": [
+      {
+        "target": {
+          "kind": "recordField",
+          "owner": "trigger.initProperties",
+          "path": "serviceType"
+        },
+        "metadata": {
+          "label": "Event Channel",
+          "description": "The type of Twilio status callback to listen for"
+        },
+        "source": {
+          "construct": {
+            "kind": "SERVICE_TYPE_DESCRIPTOR"
+          },
+          "module": {
+            "name": "twilio"
+          }
+        },
+        "state": {
+          "enabled": true,
+          "editable": true,
+          "optional": false,
+          "advanced": false
+        },
+        "key": "serviceType",
+        "default": "twilio:SmsStatusService"
+      }
+    ]
+  },
+  "listeners": [
+    {
+      "target": "$listener",
+      "form": {
+        "section": {
+          "label": "Listener",
+          "description": "Attach the service to a new or existing Twilio webhook listener."
+        },
+        "createNew": {
+          "label": "Create New Listener",
+          "description": "Define a new Twilio webhook listener in the project."
+        },
+        "listenerConfig": {
+          "label": "Listener Configurations",
+          "description": "Configure the Twilio webhook listener."
+        },
+        "useExisting": {
+          "label": "Use Existing Listener",
+          "description": "Attach to a Twilio listener already declared in the project."
+        },
+        "existingListener": {
+          "label": "Listener",
+          "description": "Select an existing listener to attach the service to."
+        },
+        "existingListenerItems": [
+          "twilioListener"
+        ],
+        "existingListenerValue": "twilioListener"
+      },
+      "formFields": {
+        "listenerVarName": {
+          "key": "listenerVarName",
+          "default": "twilioListener",
+          "metadata": {
+            "label": "Listener Name",
+            "description": "Provide a name for the listener being created"
+          },
+          "source": {
+            "construct": {
+              "kind": "LISTENER_VAR_NAME"
+            }
+          },
+          "state": {
+            "enabled": true,
+            "editable": true,
+            "optional": false,
+            "advanced": false
+          }
+        },
+        "listenOn": {
+          "key": "listenOn",
+          "placeholder": "8090",
+          "default": "8090",
+          "metadata": {
+            "label": "Webhook Listener Port",
+            "description": "The port on which the webhook listener accepts incoming HTTP requests"
+          },
+          "source": {
+            "argument": {
+              "kind": "LISTENER_PARAM_REQUIRED",
+              "position": 2,
+              "originalName": "listenOn"
+            }
+          },
+          "state": {
+            "enabled": true,
+            "editable": true,
+            "optional": true,
+            "advanced": false
+          }
+        },
+        "listenerConfigFallback": {
+          "key": "listenerConfigFallback",
+          "default": "{}",
+          "metadata": {
+            "label": "Listener Config",
+            "description": "Fallback empty value for the listener config record when no fields under it are set."
+          },
+          "source": {
+            "argument": {
+              "kind": "LISTENER_PARAM_REQUIRED",
+              "position": 1,
+              "originalName": "listenerConfig"
+            }
+          },
+          "state": {
+            "enabled": true,
+            "editable": false,
+            "optional": true,
+            "advanced": true,
+            "hidden": true
+          }
+        },
+        "webhookSecret": {
+          "key": "webhookSecret",
+          "placeholder": "",
+          "default": "",
+          "metadata": {
+            "label": "Auth Token",
+            "description": "Auth Token of your Twilio account, used to validate incoming Twilio callbacks"
+          },
+          "source": {
+            "argument": {
+              "kind": "LISTENER_PARAM_CONFIG_FIELD",
+              "originalName": "webhookSecret",
+              "position": 1
+            },
+            "path": "webhookSecret"
+          },
+          "state": {
+            "enabled": true,
+            "editable": true,
+            "optional": true,
+            "advanced": false
+          }
+        },
+        "webhookBaseUrl": {
+          "key": "webhookBaseUrl",
+          "placeholder": "https://example.com",
+          "default": "",
+          "metadata": {
+            "label": "Webhook Base URL",
+            "description": "Public base URL Twilio calls, without a trailing slash. Twilio signs the full URL, so it must match exactly"
+          },
+          "source": {
+            "argument": {
+              "kind": "LISTENER_PARAM_CONFIG_FIELD",
+              "originalName": "webhookBaseUrl",
+              "position": 1
+            },
+            "path": "webhookBaseUrl"
+          },
+          "state": {
+            "enabled": true,
+            "editable": true,
+            "optional": true,
+            "advanced": false
+          }
+        }
+      }
+    }
+  ],
+  "serviceTypes": [
+    {
+      "target": "$callStatus",
+      "metadata": {
+        "label": "Call Status",
+        "description": "Triggered when an event related to Twilio call status is received. Available actions: onInitiated, onQueued, onRinging, onInProgress, onCompleted, onBusy, onFailed, onNoAnswer, and onCanceled."
+      },
+      "source": {
+        "construct": {
+          "kind": "SERVICE_TYPE_DESCRIPTOR"
+        },
+        "argument": {
+          "originalName": "CallStatusService"
+        },
+        "module": {
+          "name": "twilio"
+        }
+      },
+      "state": {
+        "enabled": false,
+        "editable": true
+      }
+    },
+    {
+      "target": "$smsStatus",
+      "metadata": {
+        "label": "Message Status",
+        "description": "Triggered when an event related to Twilio message status is received. Available actions: onAccepted, onQueued, onSending, onSent, onFailed, onDelivered, onUndelivered, onReceiving, onReceived, onScheduled, onRead, onCanceled, and onPartiallyDelivered."
+      },
+      "source": {
+        "construct": {
+          "kind": "SERVICE_TYPE_DESCRIPTOR"
+        },
+        "argument": {
+          "originalName": "SmsStatusService"
+        },
+        "module": {
+          "name": "twilio"
+        }
+      },
+      "state": {
+        "enabled": true,
+        "editable": true
+      }
+    }
+  ],
+  "artifactInfo": {
+    "displayLabel": "Twilio Event Integration",
+    "icon": {
+      "lightPath": "icons/light.svg",
+      "darkPath": "icons/dark.svg"
+    }
+  }
+}
