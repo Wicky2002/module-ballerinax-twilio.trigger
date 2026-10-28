@@ -12,7 +12,7 @@ Copy your Auth Token, expose the running example with a public URL, and set it a
 
 ## Running an example
 
-Execute the following commands to build an example from the source:
+Execute the following commands from an example's directory (for example `cd call-outcome-logger`) to build it from the source:
 
 * To build an example:
 
