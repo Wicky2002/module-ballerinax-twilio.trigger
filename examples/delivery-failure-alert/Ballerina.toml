@@ -1,0 +1,5 @@
+[package]
+org = "ballerina_example"
+name = "delivery_failure_alert"
+version = "0.1.0"
+distribution = "2201.13.0"
