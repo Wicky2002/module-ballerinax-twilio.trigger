@@ -16,6 +16,15 @@ This module receives Twilio's status callbacks directly - it does not call Twili
 your behalf. Use the [`ballerinax/twilio`](https://central.ballerina.io/ballerinax/twilio/latest)
 connector for that, for example to send a message.
 
+### Key features
+
+- Receives Twilio call status (9 statuses) and message status (13 statuses) callbacks
+- Verifies every callback with the account's Auth Token (`X-Twilio-Signature`, signed over the full URL and parameters)
+- Serves call and message callbacks on their own paths, `/callStatus` and `/smsStatus`
+- Acknowledges each delivery before running your handler, so a slow or failing handler doesn't cause retries
+- Services can be attached on their own path, so several triggers and HTTP services can share one port
+- Trigger services are listed by `bal build --export-endpoints` (Ballerina 2201.13.6 or later)
+
 ## Setup guide
 
 Before using this trigger in your Ballerina application, you need a Twilio account with a phone
