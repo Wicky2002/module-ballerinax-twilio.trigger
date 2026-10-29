@@ -39,37 +39,44 @@ public class Listener {
         DispatcherService? existing = self.dispatchers[path];
         if existing is DispatcherService {
             dispatcher = existing;
+            check dispatcher.addServiceRef(serviceTypeStr, serviceRef);
         } else {
             dispatcher = new (self.listenerConfig.webhookSecret, self.listenerConfig.webhookBaseUrl);
+            check dispatcher.addServiceRef(serviceTypeStr, serviceRef);
             check self.httpListener.attach(dispatcher, path == "" ? () : path);
             self.dispatchers[path] = dispatcher;
         }
-        check dispatcher.addServiceRef(serviceTypeStr, serviceRef);
         self.attachments.push([path, serviceRef]);
     }
 
     public isolated function detach(GenericServiceType serviceRef) returns error? {
         string serviceTypeStr = check self.getServiceTypeStr(serviceRef);
-        foreach int i in 0 ..< self.attachments.length() {
+        boolean detached = false;
+        int i = 0;
+        while i < self.attachments.length() {
+            if self.attachments[i][1] !== serviceRef {
+                i += 1;
+                continue;
+            }
             string path = self.attachments[i][0];
-            if self.attachments[i][1] === serviceRef {
-                DispatcherService dispatcher = self.dispatchers.get(path);
-                check dispatcher.removeServiceRef(serviceTypeStr);
-                _ = self.attachments.remove(i);
-                boolean pathInUse = false;
-                foreach [string, GenericServiceType] attachment in self.attachments {
-                    if attachment[0] == path {
-                        pathInUse = true;
-                    }
+            DispatcherService dispatcher = self.dispatchers.get(path);
+            check dispatcher.removeServiceRef(serviceTypeStr);
+            _ = self.attachments.remove(i);
+            detached = true;
+            boolean pathInUse = false;
+            foreach [string, GenericServiceType] attachment in self.attachments {
+                if attachment[0] == path {
+                    pathInUse = true;
                 }
-                if !pathInUse {
-                    check self.httpListener.detach(dispatcher);
-                    _ = self.dispatchers.remove(path);
-                }
-                return;
+            }
+            if !pathInUse {
+                check self.httpListener.detach(dispatcher);
+                _ = self.dispatchers.remove(path);
             }
         }
-        return error(string `Cannot detach the service of type ${serviceTypeStr}. Service has not been attached to the listener before`);
+        if !detached {
+            return error(string `Cannot detach the service of type ${serviceTypeStr}. Service has not been attached to the listener before`);
+        }
     }
 
     public isolated function 'start() returns error? {

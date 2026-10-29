@@ -48,6 +48,8 @@ service class DispatcherService {
     resource function post callStatus(http:Caller caller, http:Request request) returns error? {
         error? verifyResult = self.verifyWebhookSignature(request, self.webhookSecret);
         if verifyResult is error {
+            string reason = verifyResult.message().startsWith("Unauthorized:") ? verifyResult.message() : "Unauthorized: Malformed Request";
+            log:printWarn("WEBHOOK_SIGNATURE_REJECTED", reason = reason, path = request.rawPath);
             http:Response r = new;
             r.statusCode = http:STATUS_UNAUTHORIZED;
             check caller->respond(r);
@@ -74,6 +76,8 @@ service class DispatcherService {
     resource function post smsStatus(http:Caller caller, http:Request request) returns error? {
         error? verifyResult = self.verifyWebhookSignature(request, self.webhookSecret);
         if verifyResult is error {
+            string reason = verifyResult.message().startsWith("Unauthorized:") ? verifyResult.message() : "Unauthorized: Malformed Request";
+            log:printWarn("WEBHOOK_SIGNATURE_REJECTED", reason = reason, path = request.rawPath);
             http:Response r = new;
             r.statusCode = http:STATUS_UNAUTHORIZED;
             check caller->respond(r);
@@ -98,7 +102,7 @@ service class DispatcherService {
     }
 
     private isolated function verifyWebhookSignature(http:Request request, string? webhookSecret) returns error? {
-        if webhookSecret is () {
+        if webhookSecret is () || webhookSecret.trim() == "" {
             return error("Unauthorized: Webhook Secret Not Configured");
         }
         if !request.hasHeader("X-Twilio-Signature") {
