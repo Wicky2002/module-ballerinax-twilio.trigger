@@ -108,6 +108,8 @@ clean {
 
 build.dependsOn "updateTomlFiles"
 build.dependsOn ":twilio.trigger-compiler-plugin:build"
+// bal test loads the compiler plugin jar named in CompilerPlugin.toml, so it must be built first.
+test.dependsOn ":twilio.trigger-compiler-plugin:jar"
 build.dependsOn "generatePomFileForMavenPublication"
 publishToMavenLocal.dependsOn build
 publish.dependsOn build

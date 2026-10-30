@@ -30,6 +30,10 @@ for /f "tokens=2 delims== " %%A in ('findstr /r "^name" "%BAL_HOME_DIR%\Ballerin
     set BAL_PACKAGE_NAME=!BAL_PACKAGE_NAME:~0,-1!
 )
 
+:: bal pack bundles the compiler plugin jar named in CompilerPlugin.toml, so build it first
+call "%BAL_HOME_DIR%\..\gradlew.bat" -p "%BAL_HOME_DIR%\.." :%BAL_PACKAGE_NAME%-compiler-plugin:jar
+if errorlevel 1 exit /b 1
+
 :: Push the package to the local repository
 cd /d "%BAL_HOME_DIR%"
 call bal pack

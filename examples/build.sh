@@ -34,6 +34,10 @@ if [[ ! -f "$BAL_HOME_DIR/Ballerina.toml" ]]; then
 fi
 BAL_PACKAGE_NAME=$(awk -F'"' '/^name/ {print $2}' "$BAL_HOME_DIR/Ballerina.toml")
 
+# bal pack bundles the compiler plugin jar named in CompilerPlugin.toml, so build it first
+echo "Building the compiler plugin..."
+(cd "$BAL_HOME_DIR/.." && ./gradlew ":$BAL_PACKAGE_NAME-compiler-plugin:jar")
+
 # Push the package to the local repository
 echo "Packing and pushing the Ballerina package..."
 cd "$BAL_HOME_DIR"
