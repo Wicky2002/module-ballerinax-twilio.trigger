@@ -19,7 +19,7 @@ Migrated from `asyncapi-triggers/asyncapi/twilio/asyncapi.yml` (AsyncAPI 2.1.0) 
 
 ## Verification
 
-The generated listener was checked with Twilio's own helper library (`twilio` 5.13.1, `getExpectedTwilioSignature`), which computes the signature exactly as Twilio does: callbacks signed by it were accepted and dispatched on both `/callStatus` and `/smsStatus`, including one with an undeclared extra parameter; a changed parameter, a signature for the other path and a wrong Auth Token were rejected with 401.
+The generated listener was checked with Twilio's own helper library (`twilio` 5.13.1, `getExpectedTwilioSignature`), which computes the signature exactly as Twilio does: callbacks signed by it were accepted and dispatched on both `/callStatus` and `/smsStatus`, including one with an undeclared extra parameter and one sent to a callback URL with a query string (`/smsStatus?client=acme&region=eu`); a changed parameter, a signature for the other path, a query string changed after signing and a wrong Auth Token were rejected with 401.
 
 ## Test payloads
 

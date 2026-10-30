@@ -51,8 +51,8 @@ using [ngrok](https://ngrok.com/) to expose your local listener to the internet.
 3. Write your service (see [Quickstart](#quickstart) below) with the Auth Token as
    `webhookSecret` and the ngrok URL as `webhookBaseUrl`, and run it with `bal run`.
    `webhookBaseUrl` must be exactly the scheme and host Twilio calls, without a trailing slash,
-   because Twilio signs the full URL. Use the callback URLs below without query parameters: the
-   listener checks the signature against the path only, so a URL with a query string is rejected.
+   because Twilio signs the full URL. The listener adds the path and any query string it receives,
+   so a callback URL with query parameters works too.
 
 4. To receive call status callbacks, create a call with `StatusCallback` set to
    `<ngrok URL>/callStatus`. Twilio calls `To` and plays the TwiML at `Url`; on a trial account,
