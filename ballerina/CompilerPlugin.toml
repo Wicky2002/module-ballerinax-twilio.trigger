@@ -1,0 +1,8 @@
+# Written by bal asyncapi. Packs the trigger's compiler plugin, which lists the trigger's services in
+# target/artifact/endpoints.yaml when an app is built with bal build --export-endpoints.
+[plugin]
+id = "asyncapi-compiler-plugin"
+class = "io.ballerina.asyncapi.trigger.plugin.AsyncAPICompilerPlugin"
+
+[[dependency]]
+path = "lib/asyncapi-trigger-compiler-plugin.jar"
