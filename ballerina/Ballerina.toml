@@ -2,7 +2,7 @@
 distribution = "2201.13.0"
 org = "ballerinax"
 name = "twilio.trigger"
-version = "0.9.0"
+version = "1.0.0"
 license = ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["Name/Twilio Trigger", "Area/Communication", "Vendor/Twilio", "Cost/Freemium", "Type/Trigger"]
