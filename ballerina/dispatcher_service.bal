@@ -237,8 +237,9 @@ service class DispatcherService {
     private isolated function executeRemoteFunc(json payload, string eventName, string serviceTypeStr, string eventFunction) returns error? {
         GenericServiceType? genericService = self.services[serviceTypeStr];
         if genericService is GenericServiceType {
-            any boundEvent = check self.nativeHandler.bindEventPayload(genericService, eventFunction, payload);
-            check self.nativeHandler.invokeRemoteFunction(boundEvent, eventName, eventFunction, genericService);
+            service object {} serviceObj = genericService;
+            any boundEvent = check self.nativeHandler.bindEventPayload(serviceObj, eventFunction, payload);
+            check self.nativeHandler.invokeRemoteFunction(boundEvent, eventName, eventFunction, serviceObj);
         } else {
             log:printDebug("SERVICE_NOT_ATTACHED", serviceType = serviceTypeStr, eventName = eventName);
         }
